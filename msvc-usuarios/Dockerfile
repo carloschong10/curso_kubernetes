@@ -1,4 +1,4 @@
-FROM openjdk:17.0.2
+FROM openjdk:17-jdk-alpine as builder
 
 #carpeta de nuestro contenedor
 WORKDIR /app/msvc-usuarios
@@ -24,8 +24,16 @@ COPY ./msvc-usuarios/src ./src
 #como ya estamos dentro del WORKDIR, ahora compilamos con maven
 RUN ./mvnw clean install -DskipTests
 
+
+#con esto hacemos que esta segunda imagen sea la que va a producir como imagen final, pero utilizando como base la imagen anterior builder asi hacemos que sea mas liviana ya que no descargará ni utilizará ninguna dependencia
+FROM openjdk:17-jdk-alpine
+#definimos nuesto directorio de trabajo de la nueva imagen
+WORKDIR /app
+#y ahora copiamos el jar de la anterior construccion de la imagen a nuestro WORKDIR
+COPY --from=builder /app/msvc-usuarios/target/msvc-usuarios-0.0.1-SNAPSHOT.jar .
+
 #exponemos el puerto de nuestro microservicio para poder acceder a través de este a nuestro contenedor
 EXPOSE 8001
 
-#lenvatamos el jar que copiamos en el WORKDIR, y en este caso es necesario definir la ruta donde está el jar
-ENTRYPOINT ["java", "-jar", "./target/msvc-usuarios-0.0.1-SNAPSHOT.jar"]
+#lenvatamos el jar que copiamos en el WORKDIR, y ya no es necesario definir la ruta ya que nos encontramos ahí al hacer la instruccion COPY
+ENTRYPOINT ["java", "-jar", "msvc-usuarios-0.0.1-SNAPSHOT.jar"]
