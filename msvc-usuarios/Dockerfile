@@ -5,8 +5,22 @@ WORKDIR /app/msvc-usuarios
 
 #copia el pom-xml de curso-kubernetes ejecutando el docker build desde curso-kubernetes
 COPY ./pom.xml /app
-#copia todos los archivos de msvc-usuarios a la carpeta del directorio de trabajo (WORKDIR)
-COPY ./msvc-usuarios .
+#copia la carpeta .mvn de msvc-usuarios a una carpeta .mvn que creará en el directorio de trabajo (WORKDIR)
+COPY ./msvc-usuarios/.mvn ./.mvn
+#copia el batch .mvnw de msvc-usuarios a la carpeta del directorio de trabajo (WORKDIR)
+COPY ./msvc-usuarios/mvnw .
+#copia el pom-xml de msvc-usuarios a la carpeta del directorio de trabajo (WORKDIR)
+COPY ./msvc-usuarios/pom.xml .
+
+#como ya estamos dentro del WORKDIR, ahora le decimos a maven no compile ni ejecute el test, y que tambien no compile ni ejecute el main, y que solamente empaquete el proyecto sin los test y sin el codigo fuente y eliminamos la carpeta target
+#con esto hacemos que descargue todas las dependecias del proyecto y que queden en CACHE, para que cuando cambiemos algo en el codigo fuente y volvamos a reconstruir la imagen no las vuelva a descargar ya que están en CACHE
+RUN ./mvnw clean install -Dmaven.test.skip -Dmaven.main.skip -Dspring-boot.repackage.skip && rm -r ./target/
+#dependency:go-offline es similar a la instruccion anterior, solo que descarga unas cositas mas, pero siempre es mejor utilizar la instruccion anterior
+#RUN ./mvnw dependency:go-offline
+
+#ahora copiamos el contenido de src de msvc-usuarios a una carpeta src que creará en  directorio de trabajo (WORKDIR)
+COPY ./msvc-usuarios/src ./src
+
 #como ya estamos dentro del WORKDIR, ahora compilamos con maven
 RUN ./mvnw clean install -DskipTests
 
