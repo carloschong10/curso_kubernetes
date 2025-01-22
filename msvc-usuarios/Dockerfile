@@ -36,4 +36,7 @@ COPY --from=builder /app/msvc-usuarios/target/msvc-usuarios-0.0.1-SNAPSHOT.jar .
 EXPOSE 8001
 
 #lenvatamos el jar que copiamos en el WORKDIR, y ya no es necesario definir la ruta ya que nos encontramos ahí al hacer la instruccion COPY
-ENTRYPOINT ["java", "-jar", "msvc-usuarios-0.0.1-SNAPSHOT.jar"]
+#ENTRYPOINT ["java", "-jar", "msvc-usuarios-0.0.1-SNAPSHOT.jar"]
+#con CMD nos permite sobreescribir el comando de entrada por defecto (java -jar msvc-usuarios-0.0.1-SNAPSHOT.jar), mientras que el ENTRYPOINT es mas estricto y es fijo (inmutable)
+#eso es importante cuando queramos levantar el contendor en modo interactivo (-it)
+CMD ["java", "-jar", "msvc-usuarios-0.0.1-SNAPSHOT.jar"]
