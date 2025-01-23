@@ -29,6 +29,8 @@ RUN ./mvnw clean install -DskipTests
 FROM openjdk:17-jdk-alpine
 #definimos nuesto directorio de trabajo de la nueva imagen
 WORKDIR /app
+#creamos la ruta donde se guardarán los logs
+RUN mkdir ./logs
 #y ahora copiamos el jar de la anterior construccion de la imagen a nuestro WORKDIR
 COPY --from=builder /app/msvc-usuarios/target/msvc-usuarios-0.0.1-SNAPSHOT.jar .
 
