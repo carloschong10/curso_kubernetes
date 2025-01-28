@@ -34,8 +34,10 @@ RUN mkdir ./logs
 #y ahora copiamos el jar de la anterior construccion de la imagen a nuestro WORKDIR
 COPY --from=builder /app/msvc-usuarios/target/msvc-usuarios-0.0.1-SNAPSHOT.jar .
 
+ENV PORT 8000
+
 #exponemos el puerto de nuestro microservicio para poder acceder a través de este a nuestro contenedor
-EXPOSE 8001
+EXPOSE $PORT
 
 #lenvatamos el jar que copiamos en el WORKDIR, y ya no es necesario definir la ruta ya que nos encontramos ahí al hacer la instruccion COPY
 #ENTRYPOINT ["java", "-jar", "msvc-usuarios-0.0.1-SNAPSHOT.jar"]
